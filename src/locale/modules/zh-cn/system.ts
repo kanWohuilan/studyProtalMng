@@ -1,6 +1,6 @@
 export default {
   system: {
-    title: '后台管理系统',
+    title: 'Mall后台管理系统',
     subTitle: '时间不在于你拥有多少,而在于你怎样使用。',
     welcome: '欢迎登录',
     login: '登录',

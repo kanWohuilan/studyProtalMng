@@ -1,52 +1,66 @@
 /*
- * @Date: 2022-07-24 21:43:47
- * @Description: 
+ * @Date: 2023-03-25 00:58:47
+ * @Description:
  */
 /** 引入类型 */
-import type { Route } from './index.type'
+import type { Route } from "./index.type";
 
 /** 引入路由相关的资源 */
-import router, { modules } from './index'
+import router, { modules } from "./index";
 /** 引入vuex实例 */
-import store from '@/store'
-import {getMenuList} from '@/api/system/menu'
+import store from "@/store";
+import { getMenuList } from "@/api/system/menu";
 /** 动态路由实现基础组件 */
 /** 引入全局Layout组件 */
-import Layout from '@/layout/index.vue'
+import Layout from "@/layout/index.vue";
 /** 引入多级菜单控制器组件 */
-import MenuBox from '@/components/menu/index.vue'
+import MenuBox from "@/components/menu/index.vue";
 /** 引入带有系统自定义name的组件，方便keep-alive实现 */
-import { createNameComponent } from './createNode'
+import { createNameComponent } from "./createNode";
 
 /** 引入需要权限的Modules */
-import Dashboard from './modules/dashboard'
-import Document from './modules/document'
-import Pages from './modules/pages'
-import Menu from './modules/menu'
-import Component from './modules/component'
-import Directive from './modules/directive'
-import SystemManage from './modules/systemManage'
-import Chart from './modules/chart'
-import Print from './modules/print'
-import Community from './modules/community'
-import Tab from './modules/tab'
+import Dashboard from "./modules/dashboard";
+import Document from "./modules/document";
+import Pages from "./modules/pages";
+import Menu from "./modules/menu";
+import Component from "./modules/component";
+import Directive from "./modules/directive";
+import SystemManage from "./modules/systemManage";
+import Chart from "./modules/chart";
+import Print from "./modules/print";
+import Community from "./modules/community";
+import Tab from "./modules/tab";
 
 /** 登录后需要动态加入的本地路由 */
 const asyncRoutes: Route[] = [
-  ...Dashboard,
-  ...Document,
-  ...Component,
-  ...Pages,
-  ...Menu,
-  ...Directive,
-  ...Chart,
+  // ...Dashboard,
+  // ...Document,
+  // ...Component,
+  // ...Pages,
+  // ...Menu,
+  // ...Directive,
+  // ...Chart,
   ...SystemManage,
-  ...Print,
-  ...Community,
-  ...Tab,
-]
+  // ...Print,
+  // ...Community,
+  // ...Tab,
+];
+function parseMenus(menus, data) {
+  return menus.map((item) => {
+    if (data.some((item1) => item1.menuId === item.meta.menuId)) {
+      if (item.children && item.children.length > 0) {
+        return {
+          ...item,
+          children: parseMenus(item.children, data),
+        };
+      } else {
+        return item;
+      }
+    }
+  });
+}
 
-/** 
+/**
  * @name 动态路由的权限新增，供登录后调用
  * @other 如果需要进行后端接口控制菜单的话，请在此拿到后端的菜单树与asyncRoutes对比，生成一个新的值
  */
@@ -55,12 +69,21 @@ async function addRoutes() {
   // 利用前端路由表模拟后端数据问题
   // 等待后端接口返回数据后再回调出去，防止刷新跳转404
   return new Promise<void>((resolve) => {
-    asyncRoutes.forEach(item => {
-      modules.push(item)
-      router.addRoute(item)
-    })
-    resolve()
-  })
+    getMenuList({}).then((res) => {
+      const { data } = res;
+      const routes = parseMenus(asyncRoutes, data);
+      routes.forEach((item) => {
+        //添加菜单和路由
+        modules.push(item);
+        router.addRoute(item);
+      });
+      resolve();
+    });
+    // asyncRoutes.forEach(item => {
+    //   modules.push(item)
+    //   router.addRoute(item)
+    // })
+  });
 }
 
 /**
@@ -69,6 +92,6 @@ async function addRoutes() {
 export async function getAuthRoutes() {
   // 判断token是否存在，存在则调用添加路由的方法
   if (store.state.user.token) {
-    await addRoutes()
+    await addRoutes();
   }
 }
