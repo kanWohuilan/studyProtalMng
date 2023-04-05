@@ -1,6 +1,7 @@
 <template>
   <Layer :layer="layer" @confirm="submit">
-    <el-form
+    <Form ref="form" :schemas="roleForm"></Form>
+    <!-- <el-form
       :model="ruleForm"
       :rules="rules"
       ref="form"
@@ -44,111 +45,107 @@
           <el-radio label="1">关闭</el-radio>
         </el-radio-group>
       </el-form-item>
-    </el-form>
+    </el-form> -->
   </Layer>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { defineComponent, ref, reactive, toRaw } from "vue";
 import Layer from "@/components/layer/index.vue";
+import Form from "@/components/form/index.vue";
 import { add, update } from "@/api/system/user";
-export default defineComponent({
-  components: {
-    Layer,
-  },
-  props: {
-    layer: {
-      type: Object,
-      default: () => {
-        return {
-          show: false,
-          title: "",
-          showButton: true,
-          row:{}
-        };
-      },
-    },
-  },
-  setup(props, ctx) {
-    let ruleForm = reactive({
-      userId:"",
-      userName: "",
-      nickName: "",
-      email: "",
-      password: "",
-      status:'0',
-      roleIds:[]
-    });
-    console.log(props.layer.row)
-    Object.keys(toRaw(ruleForm)).forEach(item => {
-      if(props.layer.row[item]) {
-        ruleForm[item] = props.layer.row[item]
-      }
-    })
-    const validateEmail = (rule: any, value: any, callback: any) => {
-      if (value === "") {
-        callback(new Error("Please input the password"));
-      }
-      if (!/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value)){
-        callback(new Error("请输入正确格式的邮箱"));
-      }
-       else {
-        callback();
-      }
-    };
-    const rules = {
-      userName: [{ required: true, message: "请输入账号", trigger: "blur" }],
-      nickName: [{ required: true, message: "请输入昵称", trigger: "blur" }],
-      email: [{ validator:validateEmail, trigger: "blur" }],
-    };
-    const options = [
-      { value: 1, label: "超级管理员" },
-      { value: 2, label: "管理员" },
-    ];
-    return {
-      ruleForm,
-      rules,
-      options,
-    };
-  },
-  methods: {
-    submit() {
-      this.$refs["form"].validate((valid: boolean) => {
-        if (valid) {
-          let params = this.ruleForm;
-          if (this.layer.row) {
-            this.updateForm(params);
-          } else {
-            this.addForm(params);
-          }
-        } else {
-          return false;
-        }
-      });
-    },
-    // 新增提交事件
-    addForm(params: object) {
-      add(params).then((res) => {
-        this.$message({
-          type: "success",
-          message: "新增成功",
-        });
-        this.layer.show = false;
-        this.$emit("getTableData", true);
-      });
-    },
-    // 编辑提交事件
-    updateForm(params: object) {
-      update(params).then((res) => {
-        this.$message({
-          type: "success",
-          message: "编辑成功",
-        });
-        this.$emit("getTableData", false);
-      });
+import { ElMessage } from "element-plus";
+import { roleFormModel } from "./roleForm";
+import { nextTick } from "process";
+const roleForm = ref(roleFormModel);
+const props = defineProps({
+  layer: {
+    type: Object,
+    default: () => {
+      return {
+        show: false,
+        title: "",
+        showButton: true,
+        row: {},
+      };
     },
   },
 });
+// let ruleForm = reactive({
+//   userId:"",
+//   userName: "",
+//   nickName: "",
+//   email: "",
+//   password: "",
+//   status:'0',
+//   roleIds:[]
+// });
+roleForm.value.forEach((item) => {
+  debugger
+  if (props.layer.row[item.field]) {
+    item.defaultValue = props.layer.row[item.field];
+  }
+});
+const validateEmail = (rule: any, value: any, callback: any) => {
+  if (value === "") {
+    callback(new Error("Please input the password"));
+  }
+  if (
+    !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+      value,
+    )
+  ) {
+    callback(new Error("请输入正确格式的邮箱"));
+  } else {
+    callback();
+  }
+};
+const form = ref(null);
+const rules = {
+  userName: [{ required: true, message: "请输入账号", trigger: "blur" }],
+  nickName: [{ required: true, message: "请输入昵称", trigger: "blur" }],
+  email: [{ validator: validateEmail, trigger: "blur" }],
+};
+const options = [
+  { value: 1, label: "超级管理员" },
+  { value: 2, label: "管理员" },
+];
+
+function submit() {
+  form.value.sumbitForm().then((valid: boolean) => {
+    if (valid) {
+      let params = ruleForm;
+      if (props.layer.row) {
+        updateForm(params);
+      } else {
+        addForm(params);
+      }
+    } else {
+      return false;
+    }
+  });
+}
+// 新增提交事件
+function addForm(params: object) {
+  add(params).then((res) => {
+    ElMessage({
+      type: "success",
+      message: "新增成功",
+    });
+    props.layer.show = false;
+    ElMessage("getTableData", true);
+  });
+}
+// 编辑提交事件
+function updateForm(params: object) {
+  update(params).then((res) => {
+    ElMessage({
+      type: "success",
+      message: "编辑成功",
+    });
+    ElMessage("getTableData", false);
+  });
+}
 </script>
 
 <style lang="scss" scoped></style>

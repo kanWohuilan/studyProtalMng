@@ -8,4 +8,12 @@ export function getRoleList(data: object) {
     params:data
   })
 }
+// 修改角色状态
+export function changeStatus(data: object) {
+  return request({
+    url: 'system/role/changeStatus',
+    method: 'post',
+    data
+  })
+}
 

@@ -3,7 +3,7 @@
     <div class="layout-container-table">
       <Table
         ref="table"
-        :columns="roleTable"
+        :columns="memberTable"
         v-model:page="page"
         v-model:searchValue="query.userName"
         :loading="loading"
@@ -52,14 +52,14 @@
 
 <script lang="ts" setup>
 import { defineComponent, ref, reactive, computed } from "vue";
-import { Page } from "@/components/table/type";
 import { getRoleList,changeStatus} from "@/api/system/role";
+import { Page } from "@/components/table/type";
 import { LayerInterface } from "@/components/layer/index.vue";
 import { ElMessage } from "element-plus";
 import Table from "@/components/table/index.vue";
 import Layer from "./layer.vue";
 import { Plus, Delete, Search } from "@element-plus/icons";
-import {roleTable} from "./roleTable"
+import {memberTable} from "./membertable"
     // 存储搜索用的数据
     const query = reactive({
       userName: "",

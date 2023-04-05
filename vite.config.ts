@@ -1,3 +1,4 @@
+import { resolve } from "path";
 /*
  * @Author: luoxi
  * @Date: 2022-01-25 09:51:12
@@ -6,11 +7,14 @@
  * @FilePath: \vue-admin-box\vite.config.ts
  * @Description:
  */
-import { ConfigEnv, UserConfigExport } from "vite";
-import vue from "@vitejs/plugin-vue";
+import {
+  ConfigEnv,
+  UserConfigExport,
+} from "vite";
 import { viteMockServe } from "vite-plugin-mock";
+
+import vue from "@vitejs/plugin-vue";
 import { vitePluginSvg } from "@webxrd/vite-plugin-svg";
-import { resolve } from "path";
 
 const pathResolve = (dir: string): any => {
   return resolve(__dirname, ".", dir);
@@ -43,6 +47,11 @@ export default ({ command }: ConfigEnv): UserConfigExport => {
           rewrite: (path) => path.replace(/\/dev-api/, ""),
         },
       },
+    },
+    esbuild: {
+      jsxFactory: 'h',
+      jsxFragment: 'Fragment',
+      jsxInject: "import { h } from 'vue';"
     },
     build: {
       rollupOptions: {

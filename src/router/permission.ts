@@ -1,35 +1,17 @@
+import { getMenuList } from "@/api/system/menu";
+/** 引入vuex实例 */
+import store from "@/store";
+
+/** 引入路由相关的资源 */
+import router, { modules } from "./index";
 /*
  * @Date: 2023-03-25 00:58:47
  * @Description:
  */
 /** 引入类型 */
 import type { Route } from "./index.type";
-
-/** 引入路由相关的资源 */
-import router, { modules } from "./index";
-/** 引入vuex实例 */
-import store from "@/store";
-import { getMenuList } from "@/api/system/menu";
-/** 动态路由实现基础组件 */
-/** 引入全局Layout组件 */
-import Layout from "@/layout/index.vue";
-/** 引入多级菜单控制器组件 */
-import MenuBox from "@/components/menu/index.vue";
-/** 引入带有系统自定义name的组件，方便keep-alive实现 */
-import { createNameComponent } from "./createNode";
-
-/** 引入需要权限的Modules */
-import Dashboard from "./modules/dashboard";
-import Document from "./modules/document";
-import Pages from "./modules/pages";
-import Menu from "./modules/menu";
-import Component from "./modules/component";
-import Directive from "./modules/directive";
+import memberManage from "./modules/memberManage";
 import SystemManage from "./modules/systemManage";
-import Chart from "./modules/chart";
-import Print from "./modules/print";
-import Community from "./modules/community";
-import Tab from "./modules/tab";
 
 /** 登录后需要动态加入的本地路由 */
 const asyncRoutes: Route[] = [
@@ -41,6 +23,7 @@ const asyncRoutes: Route[] = [
   // ...Directive,
   // ...Chart,
   ...SystemManage,
+  ...memberManage
   // ...Print,
   // ...Community,
   // ...Tab,
