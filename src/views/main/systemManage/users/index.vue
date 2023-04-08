@@ -1,64 +1,22 @@
 <template>
   <div class="layout-container">
-    <div class="layout-container-form flex space-between">
-      <div class="layout-container-form-handle">
-        <el-button type="primary" :icon="Plus" @click="handleAdd">{{
-          $t("message.common.add")
-        }}</el-button>
-        <el-popconfirm
-          :title="$t('message.common.delTip')"
-          @confirm="handleDel(chooseData)"
-        >
-          <template #reference>
-            <el-button
-              type="danger"
-              :icon="Delete"
-              :disabled="chooseData.length === 0"
-              >{{ $t("message.common.delBat") }}</el-button
-            >
-          </template>
-        </el-popconfirm>
-      </div>
-      <div class="layout-container-form-search">
-        <el-input
-          v-model="query.userName"
-          :placeholder="$t('message.common.searchTip')"
-          clearable
-        ></el-input>
-        <el-button
-          type="primary"
-          :icon="Search"
-          class="search-btn"
-          @click="getTableData(true)"
-          >{{ $t("message.common.search") }}</el-button
-        >
-      </div>
-    </div>
     <div class="layout-container-table">
       <Table
         ref="table"
+        :columns="userTableModel"
         v-model:page="page"
-        v-loading="loading"
+        :loading="loading"
         :showSelection="true"
         :data="tableData"
         @getTableData="getTableData"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column prop="userId" label="Id" align="center" width="80" />
-        <el-table-column prop="userName" label="用户名" align="center" />
-        <el-table-column prop="nickName" label="昵称" align="center" />
-        <el-table-column prop="email" label="邮箱" align="center" />
-        <el-table-column prop="isAdmin" label="角色" align="center"
-        :show-overflow-tooltip="true"
-        >
-          <template #default="scope">
+          <template #roles="scope">
             <span>
               {{ rolesName(scope.row.roles) }}
             </span>
           </template>
-        </el-table-column>
-        <el-table-column prop="status" label="状态" align="center">
-          <template #default="scope">
+          <template #status="scope">
             <span class="statusName">{{
               scope.row.status === "0" ? "启用" : "禁用"
             }}</span>
@@ -72,14 +30,7 @@
               @change="handleUpdateStatus(scope.row)"
             ></el-switch>
           </template>
-        </el-table-column>
-        <el-table-column
-          :label="$t('message.common.handle')"
-          align="center"
-          fixed="right"
-          width="200"
-        >
-          <template #default="scope">
+          <template #action="scope">
             <el-button @click="handleEdit(scope.row)">{{
               $t("message.common.update")
             }}</el-button>
@@ -94,14 +45,13 @@
               </template>
             </el-popconfirm>
           </template>
-        </el-table-column>
       </Table>
       <Layer :layer="layer" @getTableData="getTableData" v-if="layer.show" />
     </div>
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { defineComponent, ref, reactive, computed } from "vue";
 import { Page } from "@/components/table/type";
 import { getData, del, updateStatus } from "@/api/system/user";
@@ -110,12 +60,7 @@ import { ElMessage } from "element-plus";
 import Table from "@/components/table/index.vue";
 import Layer from "./layer.vue";
 import { Plus, Delete, Search } from "@element-plus/icons";
-export default defineComponent({
-  components: {
-    Table,
-    Layer,
-  },
-  setup() {
+import {userTableModel} from "./userTable"
     // 存储搜索用的数据
     const query = reactive({
       userName: "",
@@ -232,26 +177,7 @@ export default defineComponent({
         });
     };
     getTableData(true);
-    return {
-      Plus,
-      Delete,
-      Search,
-      query,
-      tableData,
-      chooseData,
-      loading,
-      page,
-      layer,
-      handleSelectionChange,
-      getTableData,
-      handleDel,
-      handleAdd,
-      handleEdit,
-      handleUpdateStatus,
-      rolesName,
-    };
-  },
-});
+   
 </script>
 
 <style lang="scss" scoped>

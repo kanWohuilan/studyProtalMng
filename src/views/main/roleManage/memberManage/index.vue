@@ -52,7 +52,7 @@
 
 <script lang="ts" setup>
 import { defineComponent, ref, reactive, computed } from "vue";
-import { getRoleList,changeStatus} from "@/api/system/role";
+import { getMemberList} from "@/api/role/member";
 import { Page } from "@/components/table/type";
 import { LayerInterface } from "@/components/layer/index.vue";
 import { ElMessage } from "element-plus";
@@ -101,7 +101,7 @@ import {memberTable} from "./membertable"
         pageSize: page.size,
         ...query,
       };
-      getRoleList(params)
+      getMemberList(params)
         .then((res) => {
           let data = res.rows;
           data.forEach((d: any) => {
@@ -158,22 +158,22 @@ import {memberTable} from "./membertable"
         roleId: row.roleId,
         status: row.status,
       };
-      changeStatus(params)
-        .then((res) => {
-          ElMessage({
-            type: "success",
-            message: "状态变更成功",
-          });
-        })
-        .catch((err) => {
-          ElMessage({
-            type: "error",
-            message: "状态变更失败",
-          });
-        })
-        .finally(() => {
-          row.loading = false;
-        });
+      // changeStatus(params)
+      //   .then((res) => {
+      //     ElMessage({
+      //       type: "success",
+      //       message: "状态变更成功",
+      //     });
+      //   })
+      //   .catch((err) => {
+      //     ElMessage({
+      //       type: "error",
+      //       message: "状态变更失败",
+      //     });
+      //   })
+      //   .finally(() => {
+      //     row.loading = false;
+      //   });
     };
     getTableData(true);
 </script>
