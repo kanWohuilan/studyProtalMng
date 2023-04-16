@@ -11,6 +11,7 @@ import router, { modules } from "./index";
 /** 引入类型 */
 import type { Route } from "./index.type";
 import memberManage from "./modules/memberManage";
+import productManage from "./modules/product";
 import SystemManage from "./modules/systemManage";
 
 /** 登录后需要动态加入的本地路由 */
@@ -23,7 +24,8 @@ const asyncRoutes: Route[] = [
   // ...Directive,
   // ...Chart,
   ...SystemManage,
-  ...memberManage
+  ...memberManage,
+  ...productManage
   // ...Print,
   // ...Community,
   // ...Tab,

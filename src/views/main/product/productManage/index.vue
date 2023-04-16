@@ -2,17 +2,17 @@
  * @Author: fgq
  * @Date: 2023-04-06 00:51:49
  * @LastEditors: fgq
- * @LastEditTime: 2023-04-07 00:17:46
+ * @LastEditTime: 2023-04-15 16:40:11
  * @Description: 
 -->
 <template>
   <div class="layout-container">
     <div class="layout-container-table">
+      <SearchForm :schemas="productSearchModel" @getData="searchData"> </SearchForm>
       <Table
         ref="table"
         :columns="productTableModel"
         v-model:page="page"
-        v-model:searchValue="query.userName"
         :loading="loading"
         :showSelection="true"
         :data="tableData"
@@ -21,6 +21,9 @@
       >
         <template #dataScope="scope">
           {{ dataScope[scope.row.dataScope - 1] }}
+        </template>
+        <template #pic="scope">
+          <img :src="scope.row.pic" alt="">
         </template>
         <template #status="scope">
           <span class="statusName">{{ scope.row.status === "0" ? "启用" : "禁用" }}</span>
@@ -53,15 +56,14 @@ import { defineComponent, ref, reactive, computed } from "vue";
 import { getProductList } from "@/api/product/product";
 import { Page } from "@/components/table/type";
 import { LayerInterface } from "@/components/layer/index.vue";
+import SearchForm from "@/components/searchForm/index.vue";
 import { ElMessage } from "element-plus";
 import Table from "@/components/table/index.vue";
 import Layer from "./layer.vue";
 import { Plus, Delete, Search } from "@element-plus/icons";
 import { productTableModel } from "./productTableModel";
-// 存储搜索用的数据
-const query = reactive({
-  userName: "",
-});
+import { useProductSearchModel } from "./useProductSearchModel";
+const {productSearchModel} = useProductSearchModel()
 // 弹窗控制器
 const layer: LayerInterface = reactive({
   show: false,
@@ -87,21 +89,24 @@ const chooseData = ref([]);
 const handleSelectionChange = (val: []) => {
   chooseData.value = val;
 };
+const searchData = (data:any)=> {
+  getTableData(true,data)
+}
 // 获取表格数据
 // params <init> Boolean ，默认为false，用于判断是否需要初始化分页
-const getTableData = (init: Boolean) => {
+const getTableData = (init: Boolean,paramsData:Object) => {
   loading.value = true;
   if (init) {
     page.index = 1;
   }
   let params = {
-    page: page.index,
+    pageNum: page.index,
     pageSize: page.size,
-    ...query,
+    ...paramsData
   };
   getProductList(params)
     .then((res) => {
-      let data = res.rows;
+      let data = res.data;
       data.forEach((d: any) => {
         d.loading = false;
       });

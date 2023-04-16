@@ -2,7 +2,7 @@
  * @Author: fgq
  * @Date: 2023-04-07 00:12:08
  * @LastEditors: fgq
- * @LastEditTime: 2023-04-07 00:17:16
+ * @LastEditTime: 2023-04-09 15:08:33
  * @Description: 
  */
 export const productTableModel = [
@@ -31,6 +31,11 @@ export const productTableModel = [
   {
     prop: "sale",
     label: "销量",
+    align: "center",
+  },
+ {
+    prop: "publishStatus",
+    label: "上架状态",
     align: "center",
   },
   {

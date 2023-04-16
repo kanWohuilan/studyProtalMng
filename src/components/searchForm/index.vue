@@ -25,13 +25,6 @@
         >
         </el-option>
       </el-select>
-      <el-cascader
-        v-else-if="item.component === componentName.CASCADER"
-        v-model="formModel[item.field]"
-        v-bind="item.attributes"
-        :options="item.options"
-      >
-      </el-cascader>
       <el-radio-group
         v-else-if="item.component === componentName.RADIO"
         v-model="formModel[item.field]"
@@ -41,6 +34,13 @@
           {{ item1.text }}
         </el-radio>
       </el-radio-group>
+      <el-cascader
+        v-else-if="item.component === componentName.CASCADER"
+        v-model="formModel[item.field]"
+        v-bind="item.attributes"
+        :options="item.options"
+      >
+      </el-cascader>
       <component
         v-else
         :is="item.component"
@@ -49,6 +49,8 @@
       ></component>
     </el-form-item>
   </el-form>
+  <el-button type="primary" @click="sumbitForm">查询</el-button>
+  <el-button @click="reset">重置</el-button>
 </template>
 <script lang="ts" setup>
 import { onMounted, reactive, ref, toRaw } from "vue";
@@ -64,24 +66,29 @@ const props = defineProps({
   },
 });
 // const { handleFormValues, initDefault  } = useFormValues({});
+const emit = defineEmits(['getData'])
 const initDefault = () => {
   props.schemas.forEach((item) => {
     formModel[item.field] = item.defaultValue;
-    if (item.ruleOptions) {
-      rules[item.field] = item.ruleOptions;
-    }
   });
 };
+const reset =()=> {
+    Object.keys(formModel).forEach(item => {
+        formModel[item] = ""
+    })
+    emit('getData')
+}
 const sumbitForm = () => {
-  return new Promise<void>((resolve, reject) => {
-    form.value.validate((valid, fields) => {
-      if (valid) {
-        resolve(toRaw(formModel));
-      } else {
-        reject();
-      }
-    });
-  });
+    emit('getData',toRaw(formModel))
+//   return new Promise<void>((resolve, reject) => {
+//     form.value.validate((valid, fields) => {
+//       if (valid) {
+//         resolve(toRaw(formModel));
+//       } else {
+//         reject();
+//       }
+//     });
+//   });
 };
 defineExpose({
   sumbitForm,
