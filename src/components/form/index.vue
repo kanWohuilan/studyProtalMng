@@ -3,6 +3,7 @@
     :model="formModel"
     v-bind="$attrs"
     :rules="rules"
+    label-width="100px"
     ref="form"
     :validateOnRuleChange="false"
   >
@@ -16,6 +17,7 @@
         v-if="item.component === componentName.SELECT"
         v-model="formModel[item.field]"
         v-bind="item.attributes"
+        :placeholder="item.placeholder"
       >
         <el-option
           v-for="item1 in item.selectOptions"
@@ -26,6 +28,7 @@
         </el-option>
       </el-select>
       <el-cascader
+        :placeholder="item.placeholder"
         v-else-if="item.component === componentName.CASCADER"
         v-model="formModel[item.field]"
         v-bind="item.attributes"
@@ -41,12 +44,17 @@
           {{ item1.text }}
         </el-radio>
       </el-radio-group>
-      <component
+      <el-input
         v-else
         :is="item.component"
+        :placeholder="item.placeholder"
         v-model="formModel[item.field]"
         v-bind="item.attributes"
-      ></component>
+      >
+      <template v-for="s in item.slotList" :key="s" #[s]>
+        <slot :name="item.field+'-'+s"></slot>
+      </template>
+      </el-input>
     </el-form-item>
   </el-form>
 </template>
@@ -63,8 +71,12 @@ const props = defineProps({
     default: () => [],
   },
 });
+const slotName = (name)=>{
+  return name.split('-')[1]
+}
 // const { handleFormValues, initDefault  } = useFormValues({});
 const initDefault = () => {
+  console.log(props.schemas)
   props.schemas.forEach((item) => {
     formModel[item.field] = item.defaultValue;
     if (item.ruleOptions) {
